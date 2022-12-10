@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializers import UserSerializer
-from hunt_service.models import Applicant, Tag
+from hunt_service.models import Applicant, Tag, Vacancy
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -65,9 +65,29 @@ class ApplicantWebHook(APIView):
         applicant.tags.clear()
         # pp = pprint.PrettyPrinter(indent=2, width=30, compact=True)
         # pp.pprint(js)
-        if js["changes"]["applicant_tags"]:
+        if js["changes"] and js["changes"]["applicant_tags"]:
             tags = js["event"]["applicant_tags"]
             for tag in tags:
                 tag_obj, _ = Tag.objects.get_or_create(name=tag["name"])
                 applicant.tags.add(tag_obj)
+        return Response({}, status=status.HTTP_200_OK)
+
+
+class VacancyWebHook(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        body = request.body
+        js = json.loads(body)
+        pp = pprint.PrettyPrinter(indent=2, width=30, compact=True)
+        pp.pprint(js)
+        vac_log = js["event"]["vacancy_log"]
+        if vac_log["state"]:
+            position = js["event"]["vacancy"]["position"]
+            if vac_log["state"] == "OPEN":
+                vacancy, _ = Vacancy.objects.get_or_create(
+                    position=position, defaults={"status": Vacancy.Statuses.OPEN}
+                )
+            if vac_log["state"] == "REMOVED":
+                Vacancy.objects.filter(position=position).delete()
         return Response({}, status=status.HTTP_200_OK)
