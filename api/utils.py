@@ -1,8 +1,10 @@
 import json
-import pprint
 
 import requests
 from django.conf import settings
+from rest_framework import status
+
+from hunt_service.models import Applicant, Vacancy
 
 
 def search_applicants(position):
@@ -39,5 +41,10 @@ def add_applicant_to_vacancy(applicant_data, vacancy_id):
             },
             json=params,
         )
-        print(response.status_code)
-        print(response.content)
+        if response.status_code == status.HTTP_200_OK:
+            vac_obj = Vacancy.objects.filter(hf_id=vacancy_id).first()
+            print(vac_obj)
+            app_obj = Applicant.objects.filter(hf_id=int(app_id)).first()
+            print(app_obj)
+            vac_obj.applicants.add(app_obj)
+            vac_obj.save()

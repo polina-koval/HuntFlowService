@@ -1,6 +1,5 @@
 import datetime
 import json
-import pprint
 
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
@@ -40,6 +39,7 @@ class ApplicantWebHook(APIView):
     def post(self, request, *args, **kwargs):
         body = request.body
         js = json.loads(body)
+        app_hf_id = js["event"]["applicant"]["id"]
         app_phone = js["event"]["applicant"]["phone"]
         app_email = js["event"]["applicant"]["email"]
         app_first_name = js["event"]["applicant"]["first_name"]
@@ -53,21 +53,22 @@ class ApplicantWebHook(APIView):
             "phone": app_phone,
             "email": app_email,
             "position": app_position,
+            "first_name": app_first_name,
+            "middle_name": app_middle_name,
+            "last_name": app_last_name,
+            "birth_date": app_birth_date,
         }
         applicant, _ = Applicant.objects.update_or_create(
-            first_name=app_first_name,
-            middle_name=app_middle_name,
-            last_name=app_last_name,
-            birth_date=app_birth_date,
+            hf_id=app_hf_id,
             defaults=app_defaults,
         )
         applicant.tags.clear()
-        # pp = pprint.PrettyPrinter(indent=2, width=30, compact=True)
-        # pp.pprint(js)
         if js["changes"] and js["changes"]["applicant_tags"]:
             tags = js["event"]["applicant_tags"]
             for tag in tags:
-                tag_obj, _ = Tag.objects.get_or_create(name=tag["name"])
+                tag_obj, _ = Tag.objects.get_or_create(
+                    name=tag["name"], hf_id=tag["id"]
+                )
                 applicant.tags.add(tag_obj)
         return Response({}, status=status.HTTP_200_OK)
 
@@ -78,18 +79,20 @@ class VacancyWebHook(APIView):
     def post(self, request, *args, **kwargs):
         body = request.body
         js = json.loads(body)
-        # pp = pprint.PrettyPrinter(indent=2, width=30, compact=True)
-        # pp.pprint(js)
         vac_log = js["event"]["vacancy_log"]
         if vac_log["state"]:
             position = js["event"]["vacancy"]["position"]
+            vac_hf_id = js["event"]["vacancy"]["id"]
             if vac_log["state"] == "OPEN":
                 vacancy, _ = Vacancy.objects.get_or_create(
-                    position=position, defaults={"status": Vacancy.Statuses.OPEN}
+                    hf_id=vac_hf_id,
+                    defaults={
+                        "position": position,
+                        "status": Vacancy.Statuses.OPEN,
+                    },
                 )
-                vacancy_id = js["event"]["vacancy"]["id"]
                 applicants = search_applicants(position=position)
-                add_applicant_to_vacancy(applicants, vacancy_id)
+                add_applicant_to_vacancy(applicants, vac_hf_id)
             if vac_log["state"] == "REMOVED":
                 Vacancy.objects.filter(position=position).delete()
         return Response({}, status=status.HTTP_200_OK)
