@@ -126,3 +126,5 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 API_KEY_HF = os.getenv("API_KEY_HF")
+ORG_ID = os.getenv("ORG_ID")
+VACANCY_DEFAULT_STATUS = os.getenv("VACANCY_DEFAULT_STATUS")
