@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializers import UserSerializer
+from api.utils import search_applicants, add_applicant_to_vacancy
 from hunt_service.models import Applicant, Tag, Vacancy
 
 
@@ -31,7 +32,6 @@ class UserViewSet(viewsets.ModelViewSet):
                 "Authorization": f"Bearer {settings.API_KEY_HF}",
             },
         )
-        print(res.content)
         return Response(serializer.data)
 
 
@@ -79,8 +79,8 @@ class VacancyWebHook(APIView):
     def post(self, request, *args, **kwargs):
         body = request.body
         js = json.loads(body)
-        pp = pprint.PrettyPrinter(indent=2, width=30, compact=True)
-        pp.pprint(js)
+        # pp = pprint.PrettyPrinter(indent=2, width=30, compact=True)
+        # pp.pprint(js)
         vac_log = js["event"]["vacancy_log"]
         if vac_log["state"]:
             position = js["event"]["vacancy"]["position"]
@@ -88,6 +88,9 @@ class VacancyWebHook(APIView):
                 vacancy, _ = Vacancy.objects.get_or_create(
                     position=position, defaults={"status": Vacancy.Statuses.OPEN}
                 )
+                vacancy_id = js["event"]["vacancy"]["id"]
+                applicants = search_applicants(position=position)
+                add_applicant_to_vacancy(applicants, vacancy_id)
             if vac_log["state"] == "REMOVED":
                 Vacancy.objects.filter(position=position).delete()
         return Response({}, status=status.HTTP_200_OK)
