@@ -1,7 +1,7 @@
 import datetime
 
 import factory
-from factory.fuzzy import FuzzyChoice, FuzzyInteger
+from factory.fuzzy import FuzzyChoice, FuzzyInteger, FuzzyDate
 
 from hunt_service.models import Applicant, Tag, Vacancy
 
@@ -22,7 +22,7 @@ class ApplicantFactory(factory.django.DjangoModelFactory):
     first_name = factory.Sequence(lambda n: f"First_name{n}")
     last_name = factory.Sequence(lambda n: f"Last_name{n}")
     middle_name = factory.Sequence(lambda n: f"Middle_name{n}")
-    birth_date = datetime.date(year=1998, month=9, day=12)
+    birth_date = FuzzyDate(start_date=datetime.date(year=1980, month=1, day=1))
     phone = factory.Sequence(lambda n: f"+798012345{n}")
     email = factory.Sequence(lambda n: f"email{n}@test.com")
     position = factory.Sequence(lambda n: f"Position{n}")
