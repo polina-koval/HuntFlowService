@@ -17,7 +17,9 @@ class Applicant(models.Model):
     email = models.CharField(max_length=255)
     position = models.CharField(max_length=255)
     tags = models.ManyToManyField(
-        Tag, related_name="applicants", blank=True, null=True
+        "Tag",
+        related_name="applicants",
+        blank=True,
     )
 
     def __str__(self):
@@ -35,6 +37,7 @@ class Vacancy(models.Model):
     status = models.CharField(
         choices=Statuses.choices, default=Statuses.CLOSE, max_length=6
     )
+    applicants = models.ManyToManyField("Applicant", related_name="vacancies")
 
     def __str__(self):
         return self.position
