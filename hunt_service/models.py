@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Tag(models.Model):
+    hf_id = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -9,6 +10,7 @@ class Tag(models.Model):
 
 
 class Applicant(models.Model):
+    hf_id = models.PositiveIntegerField(unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
@@ -32,7 +34,7 @@ class Vacancy(models.Model):
         CLOSE = "Close"
         HOLD = "Hold"
         RESUME = "Resume"
-
+    hf_id = models.PositiveIntegerField(unique=True)
     position = models.CharField(max_length=255)
     status = models.CharField(
         choices=Statuses.choices, default=Statuses.CLOSE, max_length=6

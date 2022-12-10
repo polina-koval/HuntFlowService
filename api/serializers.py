@@ -7,7 +7,7 @@ from hunt_service.models import Applicant, Tag, Vacancy
 class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag
-        fields = ["id", "name"]
+        fields = ["id", "hf_id", "name"]
 
 
 class ApplicantSerializer(serializers.HyperlinkedModelSerializer):
@@ -15,6 +15,7 @@ class ApplicantSerializer(serializers.HyperlinkedModelSerializer):
         model = Applicant
         fields = [
             "id",
+            "hf_id",
             "first_name",
             "last_name",
             "middle_name",
@@ -31,6 +32,7 @@ class VacancySerializer(serializers.HyperlinkedModelSerializer):
         model = Vacancy
         fields = [
             "id",
+            "hf_id",
             "position",
             "status",
             "applicants",
