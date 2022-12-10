@@ -14,9 +14,9 @@ class Applicant(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
-    birth_date = models.DateField()
-    phone = models.CharField(max_length=255)
-    email = models.CharField(max_length=255)
+    birth_date = models.DateField(blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
     position = models.CharField(max_length=255)
     tags = models.ManyToManyField(
         "Tag",
