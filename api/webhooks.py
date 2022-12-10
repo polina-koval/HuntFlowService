@@ -35,12 +35,11 @@ class VacancyWebHook(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        body = request.body
-        js = json.loads(body)
-        vac_log = js["event"]["vacancy_log"]
+        json_data = json.loads(request.body)
+        vac_log = json_data["event"]["vacancy_log"]
         if vac_log["state"]:
-            position = js["event"]["vacancy"]["position"]
-            vac_hf_id = js["event"]["vacancy"]["id"]
+            position = json_data["event"]["vacancy"]["position"]
+            vac_hf_id = json_data["event"]["vacancy"]["id"]
             if vac_log["state"] == "OPEN":
                 vacancy, _ = Vacancy.objects.get_or_create(
                     hf_id=vac_hf_id,
