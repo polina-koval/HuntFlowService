@@ -39,6 +39,9 @@ class Applicant(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.position}"
 
+    def get_full_name(self):
+        return f"{self.last_name} {self.first_name} {self.middle_name}"
+
 
 class Vacancy(models.Model):
     class Statuses(models.TextChoices):
