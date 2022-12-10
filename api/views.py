@@ -45,9 +45,12 @@ class ApplicantWebHook(APIView):
         app_first_name = js["event"]["applicant"]["first_name"]
         app_last_name = js["event"]["applicant"]["last_name"]
         app_middle_name = js["event"]["applicant"]["middle_name"]
-        app_birth_date = datetime.datetime.strptime(
-            js["event"]["applicant"]["birthday"], "%Y-%m-%d"
-        )
+        if js["event"]["applicant"]["birthday"] is not None:
+            app_birth_date = datetime.datetime.strptime(
+                js["event"]["applicant"]["birthday"], "%Y-%m-%d"
+            )
+        else:
+            app_birth_date = None
         app_position = js["event"]["applicant"]["position"]
         app_defaults = {
             "phone": app_phone,

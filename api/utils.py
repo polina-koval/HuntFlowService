@@ -28,6 +28,7 @@ def add_applicant_to_vacancy(applicant_data, vacancy_id):
         and applicant_data["items"][0]
     ):
         app_data = applicant_data["items"][0]
+        print(app_data)
         app_id = app_data["id"]
         params = {
             "vacancy": vacancy_id,
@@ -43,8 +44,21 @@ def add_applicant_to_vacancy(applicant_data, vacancy_id):
         )
         if response.status_code == status.HTTP_200_OK:
             vac_obj = Vacancy.objects.filter(hf_id=vacancy_id).first()
-            print(vac_obj)
-            app_obj = Applicant.objects.filter(hf_id=int(app_id)).first()
+            app_hf_id = app_data["id"]
+            app_first_name = app_data["first_name"]
+            app_last_name = app_data["last_name"]
+            app_middle_name = app_data["middle_name"]
+            app_position = app_data["position"]
+            app_defaults = {
+                "position": app_position,
+                "first_name": app_first_name,
+                "middle_name": app_middle_name,
+                "last_name": app_last_name,
+            }
+            app_obj, _ = Applicant.objects.update_or_create(
+                hf_id=app_hf_id,
+                defaults=app_defaults,
+            )
             print(app_obj)
             vac_obj.applicants.add(app_obj)
             vac_obj.save()
