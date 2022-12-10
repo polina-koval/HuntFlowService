@@ -1,5 +1,8 @@
+import hashlib
+import hmac
 import json
 
+from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -13,21 +16,54 @@ from api.utils import (
 from hunt_service.models import Tag, Vacancy
 
 
+def get_hmac(secret_key, request_body):
+    """
+    Returns X-Huntflow-Signature
+    """
+    signature = hmac.new(
+        secret_key.encode("utf-8"), request_body, hashlib.sha256
+    ).hexdigest()
+    return signature
+
+
+def hmac_is_valid(secret_key, request_body, received_hmac):
+    """
+    Check the received X-Huntflow-Signature with the expected
+    Returns: bool
+    """
+    expected_hmac = get_hmac(secret_key, request_body)
+    return expected_hmac == received_hmac
+
+
 class ApplicantWebHook(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         body = request.body
+        # ------------------
+        request_hmac = request.headers.get("X-Huntflow-Signature")
+        print(settings.APPLICANT_WEBHOOK_SECRET)
+        if request_hmac and hmac_is_valid(
+            settings.APPLICANT_WEBHOOK_SECRET,
+            request.body,
+            request_hmac,
+        ):
+            print("Yeeeep")
+        else:
+            print("NOOOOOO")
+        # ------------------
         js = json.loads(body)
-        applicant = create_or_update_applicant(js["event"]["applicant"])
-        applicant.tags.clear()
-        if js["changes"] and js["changes"].get("applicant_tags", None):
-            tags = js["event"]["applicant_tags"]
-            for tag in tags:
-                tag_obj, _ = Tag.objects.get_or_create(
-                    name=tag["name"], hf_id=tag["id"]
-                )
-                applicant.tags.add(tag_obj)
+        if js.get("event"):
+            applicant = create_or_update_applicant(js["event"]["applicant"])
+            applicant.tags.clear()
+            if js["changes"] and js["changes"].get("applicant_tags", None):
+                tags = js["event"]["applicant_tags"]
+                for tag in tags:
+                    tag_obj, _ = Tag.objects.get_or_create(
+                        name=tag["name"], hf_id=tag["id"]
+                    )
+                    applicant.tags.add(tag_obj)
+            return Response({}, status=status.HTTP_200_OK)
         return Response({}, status=status.HTTP_200_OK)
 
 
