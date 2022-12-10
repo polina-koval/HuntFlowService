@@ -3,11 +3,10 @@ from rest_framework import routers
 
 from api.views import (
     ApplicantViewSet,
-    ApplicantWebHook,
     TagViewSet,
     VacancyViewSet,
-    VacancyWebHook,
 )
+from api.webhooks import ApplicantWebHook, VacancyWebHook
 
 router = routers.DefaultRouter()
 router.register(r"tags", TagViewSet)
