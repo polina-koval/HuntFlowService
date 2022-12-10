@@ -10,31 +10,14 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import (UserSerializer, TagSerializer,
+from api.serializers import (
     ApplicantSerializer,
-    VacancySerializer, )
-from api.utils import search_applicants, add_applicant_to_vacancy
+    TagSerializer,
+    UserSerializer,
+    VacancySerializer,
+)
+from api.utils import add_applicant_to_vacancy, search_applicants
 from hunt_service.models import Applicant, Tag, Vacancy
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-
-    queryset = User.objects.all().order_by("-date_joined")
-    serializer_class = UserSerializer
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        res = requests.get(
-            "https://dev-100-api.huntflow.dev/v2/me",
-            headers={
-                "Authorization": f"Bearer {settings.API_KEY_HF}",
-            },
-        )
-        return Response(serializer.data)
 
 
 class TagViewSet(viewsets.ModelViewSet):

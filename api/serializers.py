@@ -1,13 +1,7 @@
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from hunt_service.models import Applicant, Tag, Vacancy
-
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'groups']
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):

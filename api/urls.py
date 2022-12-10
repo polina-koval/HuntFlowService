@@ -5,13 +5,11 @@ from api.views import (
     ApplicantViewSet,
     ApplicantWebHook,
     TagViewSet,
-    UserViewSet,
     VacancyViewSet,
     VacancyWebHook,
 )
 
 router = routers.DefaultRouter()
-router.register(r"users", UserViewSet)
 router.register(r"tags", TagViewSet)
 router.register(r"applicants", ApplicantViewSet)
 router.register(r"vacancies", VacancyViewSet)
