@@ -17,9 +17,9 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 router = routers.DefaultRouter()
-router.register(r"tags", TagViewSet, basename="tags")
-router.register(r"applicants", ApplicantViewSet, basename="applicants")
-router.register(r"vacancies", VacancyViewSet, basename="vacancies")
+router.register(r"tags", TagViewSet, basename="tag")
+router.register(r"applicants", ApplicantViewSet, basename="applicant")
+router.register(r"vacancies", VacancyViewSet, basename="vacancy")
 urlpatterns = router.urls
 urlpatterns += [
     re_path(
