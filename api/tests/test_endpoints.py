@@ -5,7 +5,7 @@ from rest_framework.test import APIClient, APITestCase
 from api.tests.factories import TagFactory, ApplicantFactory, VacancyFactory
 
 
-class TagsEndpointTest(APITestCase):
+class EndpointTests(APITestCase):
     def setUp(self):
         self.api_client = APIClient()
 
