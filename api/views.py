@@ -1,4 +1,3 @@
-import datetime
 import json
 
 from rest_framework import status, viewsets
@@ -11,7 +10,9 @@ from api.serializers import (
     TagSerializer,
     VacancySerializer,
 )
-from api.utils import (add_applicant_to_vacancy, search_applicants,
+from api.utils import (
+    add_applicant_to_vacancy,
+    search_applicants,
     create_or_update_applicant, )
 from hunt_service.models import Applicant, Tag, Vacancy
 
