@@ -11,7 +11,8 @@ from api.serializers import (
     TagSerializer,
     VacancySerializer,
 )
-from api.utils import add_applicant_to_vacancy, search_applicants
+from api.utils import (add_applicant_to_vacancy, search_applicants,
+    create_or_update_applicant, )
 from hunt_service.models import Applicant, Tag, Vacancy
 
 
@@ -39,34 +40,9 @@ class ApplicantWebHook(APIView):
     def post(self, request, *args, **kwargs):
         body = request.body
         js = json.loads(body)
-        app_hf_id = js["event"]["applicant"]["id"]
-        app_phone = js["event"]["applicant"]["phone"]
-        app_email = js["event"]["applicant"]["email"]
-        app_first_name = js["event"]["applicant"]["first_name"]
-        app_last_name = js["event"]["applicant"]["last_name"]
-        app_middle_name = js["event"]["applicant"]["middle_name"]
-        if js["event"]["applicant"]["birthday"] is not None:
-            app_birth_date = datetime.datetime.strptime(
-                js["event"]["applicant"]["birthday"], "%Y-%m-%d"
-            )
-        else:
-            app_birth_date = None
-        app_position = js["event"]["applicant"]["position"]
-        app_defaults = {
-            "phone": app_phone,
-            "email": app_email,
-            "position": app_position,
-            "first_name": app_first_name,
-            "middle_name": app_middle_name,
-            "last_name": app_last_name,
-            "birth_date": app_birth_date,
-        }
-        applicant, _ = Applicant.objects.update_or_create(
-            hf_id=app_hf_id,
-            defaults=app_defaults,
-        )
+        applicant = create_or_update_applicant(js["event"]["applicant"])
         applicant.tags.clear()
-        if js["changes"] and js["changes"]["applicant_tags"]:
+        if js["changes"] and js["changes"].get("applicant_tags", None):
             tags = js["event"]["applicant_tags"]
             for tag in tags:
                 tag_obj, _ = Tag.objects.get_or_create(
