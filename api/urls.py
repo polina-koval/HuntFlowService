@@ -17,9 +17,9 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 router = routers.DefaultRouter()
-router.register(r"tags", TagViewSet)
-router.register(r"applicants", ApplicantViewSet)
-router.register(r"vacancies", VacancyViewSet)
+router.register(r"tags", TagViewSet, basename="tags")
+router.register(r"applicants", ApplicantViewSet, basename="applicants")
+router.register(r"vacancies", VacancyViewSet, basename="vacancies")
 urlpatterns = router.urls
 urlpatterns += [
     re_path(
@@ -37,6 +37,10 @@ urlpatterns += [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-redoc",
     ),
-    path("applicant_webhook/", ApplicantWebHook.as_view()),
-    path("vacancy_webhook/", VacancyWebHook.as_view()),
+    path(
+        "applicant_webhook/",
+        ApplicantWebHook.as_view(),
+        name="applicant_webhook",
+    ),
+    path("vacancy_webhook/", VacancyWebHook.as_view(), name="vacancy_webhook"),
 ]
