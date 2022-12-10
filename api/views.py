@@ -10,7 +10,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import UserSerializer
+from api.serializers import (UserSerializer, TagSerializer,
+    ApplicantSerializer,
+    VacancySerializer, )
 from api.utils import search_applicants, add_applicant_to_vacancy
 from hunt_service.models import Applicant, Tag, Vacancy
 
@@ -33,6 +35,24 @@ class UserViewSet(viewsets.ModelViewSet):
             },
         )
         return Response(serializer.data)
+
+
+class TagViewSet(viewsets.ModelViewSet):
+
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+class ApplicantViewSet(viewsets.ModelViewSet):
+
+    queryset = Applicant.objects.all()
+    serializer_class = ApplicantSerializer
+
+
+class VacancyViewSet(viewsets.ModelViewSet):
+
+    queryset = Vacancy.objects.all()
+    serializer_class = VacancySerializer
 
 
 class ApplicantWebHook(APIView):
