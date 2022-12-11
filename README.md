@@ -1,6 +1,8 @@
 # HuntFlow integration service (HIF)
 Back-end rest api and admin interface for HIF. It works with python 3.11.
 
+*(The text of the test task in the test_task.txt file.)*
+
 ## Getting Started
 The first thing to do is to clone the repository:  
 ```sh
