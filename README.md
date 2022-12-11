@@ -57,5 +57,6 @@ pytest
 
 ## Built with
 * [Django](https://www.djangoproject.com/) - The web framework used.
+* [Django Rest Framework](https://www.django-rest-framework.org/) - The web APIs framework used.
 * [Django-environ](https://django-environ.readthedocs.io/en/latest/) - Used to configure Django app with environment variables.
 * [Pytest](https://docs.pytest.org/en/7.2.x/) - Tests.
