@@ -7,10 +7,14 @@ import requests
 from django.conf import settings
 from rest_framework import status
 
-from hunt_service.models import Applicant, Vacancy
+from hunt_service.models import Applicant, Tag, Vacancy
 
 
 def create_or_update_applicant(app_data):
+    """
+    Create or update applicant from the webhook data
+    Returns Tag object
+    """
     app_hf_id = app_data.get("id")
     app_phone = app_data.get("phone")
     app_email = app_data.get("email")
@@ -37,6 +41,17 @@ def create_or_update_applicant(app_data):
         defaults=app_defaults,
     )
     return applicant
+
+
+def get_or_create_tag(tag_data):
+    """
+    Get or create tag object from the webhook data
+    Returns Tag object
+    """
+    tag_obj, _ = Tag.objects.get_or_create(
+        name=tag_data["name"], hf_id=tag_data["id"]
+    )
+    return tag_obj
 
 
 def search_applicants(position):
