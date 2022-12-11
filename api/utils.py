@@ -12,17 +12,17 @@ from hunt_service.models import Applicant, Vacancy
 
 def create_or_update_applicant(app_data):
     app_hf_id = app_data.get("id")
-    app_phone = app_data.get("phone", None)
-    app_email = app_data.get("email", None)
-    app_first_name = app_data.get("first_name", None)
-    app_last_name = app_data.get("last_name", None)
-    app_middle_name = app_data.get("middle_name", None)
-    app_birth_date = app_data.get("birthday", None)
-    if app_birth_date is not None:
+    app_phone = app_data.get("phone")
+    app_email = app_data.get("email")
+    app_first_name = app_data.get("first_name")
+    app_last_name = app_data.get("last_name")
+    app_middle_name = app_data.get("middle_name")
+    app_birth_date = app_data.get("birthday")
+    if app_birth_date:
         app_birth_date = datetime.datetime.strptime(
             app_data["birthday"], "%Y-%m-%d"
         )
-    app_position = app_data.get("position", None)
+    app_position = app_data.get("position")
     app_defaults = {
         "phone": app_phone,
         "email": app_email,
@@ -40,6 +40,10 @@ def create_or_update_applicant(app_data):
 
 
 def search_applicants(position):
+    """
+    Search applicants by position field in the Huntflow service
+    Returns array of applicants
+    """
     params = {"q": position, "field": "position"}
     response = requests.get(
         f"https://dev-100-api.huntflow.dev/v2/accounts/"
@@ -54,6 +58,10 @@ def search_applicants(position):
 
 
 def add_applicant_to_vacancy(position, vacancy_id):
+    """
+    Assigns the first received applicant to a vacancy
+    in the Huntflow service and its own service.
+    """
     applicant_data = search_applicants(position=position)
     if (
         applicant_data
