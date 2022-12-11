@@ -43,15 +43,39 @@ def create_or_update_applicant(app_data):
     return applicant
 
 
-def get_or_create_tag(tag_data):
+def get_or_create_tag(tag_data=None, change_in_hw=False, app_id=None):
     """
     Get or create tag object from the webhook data
     Returns Tag object
     """
-    tag_obj, _ = Tag.objects.get_or_create(
-        name=tag_data["name"], hf_id=tag_data["id"]
-    )
-    return tag_obj
+    if tag_data:
+        tag_obj, _ = Tag.objects.get_or_create(
+            name=tag_data["name"], hf_id=tag_data["id"]
+        )
+        return tag_obj
+    elif change_in_hw and app_id:
+        tag_obj, _ = Tag.objects.get_or_create(
+            name="Нанят", hf_id=38  # TODO remove hardcode
+        )
+        response_1 = requests.get(
+            f"https://dev-100-api.huntflow.dev/v2/accounts/"
+            f"{settings.ORG_ID}/applicants/{app_id}/tags",
+            headers={
+                "Authorization": f"Bearer {settings.API_KEY_HF}",
+            },
+        )
+        current_tags = json.loads(response_1.content.decode())["tags"]
+        current_tags.append(tag_obj.hf_id)
+        params = {"tags": current_tags}
+        response_2 = requests.post(
+            f"https://dev-100-api.huntflow.dev/v2/accounts/"
+            f"{settings.ORG_ID}/applicants/{app_id}/tags",
+            headers={
+                "Authorization": f"Bearer {settings.API_KEY_HF}",
+            },
+            json=params,
+        )
+        return tag_obj
 
 
 def search_applicants(position):

@@ -37,12 +37,18 @@ class ApplicantWebHook(APIView):
                     tags = event["applicant_tags"]
                     for tag in tags:
                         tag_obj = get_or_create_tag(tag)
-                        applicant.tags.add(tag_obj)
-                    return Response({}, status=status.HTTP_200_OK)
+                        if tag_obj:
+                            applicant.tags.add(tag_obj)
                 if "applicant_log" in event:
-                    tag_data = event["applicant_log"]["status"]
-                    tag_obj = get_or_create_tag(tag_data)
-                    applicant.tags.add(tag_obj)
+                    tag_data = event["applicant_log"].get("status")
+                    if (
+                        tag_data and tag_data["name"] == "Оффер принят"
+                    ):  # TODO remove hardcode
+                        tag_obj = get_or_create_tag(
+                            change_in_hw=True, app_id=applicant.hf_id
+                        )
+                        if tag_obj:
+                            applicant.tags.add(tag_obj)
                 return Response({}, status=status.HTTP_200_OK)
             return Response({}, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
