@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase, RequestsClient
@@ -14,13 +16,14 @@ class ApplicantWebhookTest(APITestCase):
             url,
             json=self.order_data,
             headers={
-                "Content-Type": "application/json"
-                #     "X_Wc_Webhook_Signature": "secret",
+                "Content-Type": "application/json",
+                "X-Huntflow-Signatur": "secret",
             },
         )
         return response
 
-    def test_webhook_add_applicant(self):
+    @patch("api.utils.get_hmac", return_value="secret")
+    def test_webhook_add_applicant(self, mock_get_hmac):
         self.order_data = {
             "changes": {},
             "event": {
@@ -96,7 +99,8 @@ class ApplicantWebhookTest(APITestCase):
             self.order_data["event"]["applicant"]["first_name"],
         )
 
-    def test_webhook_add_tag_to_applicant(self):
+    @patch("api.utils.get_hmac", return_value="secret")
+    def test_webhook_add_tag_to_applicant(self, mock_get_hmac):
         applicant = ApplicantFactory()
         self.order_data = {
             "changes": {"applicant_tags": {"from": []}},
