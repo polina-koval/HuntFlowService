@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase, RequestsClient
 
 from api.tests.factories import ApplicantFactory, VacancyFactory
-from hunt_service.models import Applicant, Tag
+from hunt_service.models import Applicant, Tag, Vacancy
 
 
 class ApplicantWebhookTest(APITestCase):
@@ -17,7 +17,7 @@ class ApplicantWebhookTest(APITestCase):
             json=self.order_data,
             headers={
                 "Content-Type": "application/json",
-                "X-Huntflow-Signatur": "secret",
+                "X-Huntflow-Signature": "secret",
             },
         )
         return response
@@ -178,3 +178,90 @@ class ApplicantWebhookTest(APITestCase):
             tag.name, self.order_data["event"]["applicant_tags"][0]["name"]
         )
         self.assertEqual(tag.applicants.first(), applicant)
+
+
+class VacancyWebhookTest(APITestCase):
+    def webhook_response(self):
+        url = "http://testserver" + reverse("vacancy_webhook")
+        self.client = RequestsClient()
+        response = self.client.post(
+            url,
+            json=self.order_data,
+            headers={
+                "Content-Type": "application/json",
+                "X-Huntflow-Signature": "secret",
+            },
+        )
+        return response
+
+    @patch("api.utils.get_hmac", return_value="secret")
+    def test_webhook_open_vacancy(self, mock_get_hmac):
+        self.order_data = {
+            "changes": {},
+            "event": {
+                "vacancy": {
+                    "account_division": None,
+                    "account_region": None,
+                    "applicants_to_hire": 1,
+                    "body": None,
+                    "company": None,
+                    "conditions": None,
+                    "created": "2022-12-11",
+                    "deadline": None,
+                    "fill_quotas": [
+                        {
+                            "applicants_to_hire": 1,
+                            "closed": None,
+                            "created": "2022-12-11T12:03:01+03:00",
+                            "deadline": None,
+                            "id": 62,
+                            "vacancy_request": None,
+                        }
+                    ],
+                    "frame_id": 62,
+                    "hidden": False,
+                    "id": 62,
+                    "money": None,
+                    "multiple": False,
+                    "parent": None,
+                    "position": "TeamLead",
+                    "priority": 0,
+                    "requirements": None,
+                    "state": "OPEN",
+                    "values": {},
+                },
+                "vacancy_log": {
+                    "close_reason": None,
+                    "created": "2022-12-11T12:03:01+03:00",
+                    "hold_reason": None,
+                    "id": 227,
+                    "state": "OPEN",
+                },
+            },
+            "meta": {
+                "account": {
+                    "id": 14,
+                    "name": "test-ff499c5dfa9d4a0e952eae470",
+                    "nick": "test-ff499c5dfa9d4a0e952eae470",
+                },
+                "author": {
+                    "email": "test@gmail.com",
+                    "id": 13,
+                    "meta": None,
+                    "name": "test@gmail.com",
+                },
+                "domain": "dev-100.huntflow.dev",
+                "event_id": "295",
+                "event_type": "VACANCY",
+                "retry": 0,
+                "version": "2.0",
+                "webhook_action": "ADD",
+            },
+        }
+        response = self.webhook_response()
+        vacancy = Vacancy.objects.first()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            vacancy.position,
+            self.order_data["event"]["vacancy"]["position"],
+        )
