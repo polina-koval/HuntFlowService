@@ -9,7 +9,8 @@ $ cd HuntFlowService
 ```
 
 By default you'll encounter sqlite database. Follow [django documentation](https://docs.djangoproject.com/en/4.1/ref/settings/#databases) to change it.
-
+# DB Vizualization
+![DB Visualisation](db_visualisation.png)
 
 Create a virtual environment to install dependencies in and activate it:  
 

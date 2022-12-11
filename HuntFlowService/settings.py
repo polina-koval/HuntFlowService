@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "drf_yasg",
+    "django_extensions",
     "rest_framework",
     "hunt_service.apps.HuntServiceConfig"
 ]
@@ -131,3 +132,7 @@ ORG_ID = os.getenv("ORG_ID")
 VACANCY_DEFAULT_STATUS = os.getenv("VACANCY_DEFAULT_STATUS")
 APPLICANT_WEBHOOK_SECRET = os.getenv("APPLICANT_WEBHOOK_SECRET")
 VACANCY_WEBHOOK_SECRET = os.getenv("VACANCY_WEBHOOK_SECRET")
+
+GRAPH_MODELS = {
+  'app_labels': ["hunt_service"]
+}
