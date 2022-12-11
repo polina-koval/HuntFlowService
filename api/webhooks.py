@@ -1,5 +1,3 @@
-import hashlib
-import hmac
 import json
 
 from django.conf import settings
@@ -11,28 +9,10 @@ from rest_framework.views import APIView
 from api.utils import (
     add_applicant_to_vacancy,
     create_or_update_applicant,
+    hmac_is_valid,
     search_applicants,
 )
 from hunt_service.models import Tag, Vacancy
-
-
-def get_hmac(secret_key, request_body):
-    """
-    Returns X-Huntflow-Signature
-    """
-    signature = hmac.new(
-        secret_key.encode("utf-8"), request_body, hashlib.sha256
-    ).hexdigest()
-    return signature
-
-
-def hmac_is_valid(secret_key, request_body, received_hmac):
-    """
-    Check the received X-Huntflow-Signature with the expected
-    Returns: bool
-    """
-    expected_hmac = get_hmac(secret_key, request_body)
-    return expected_hmac == received_hmac
 
 
 class ApplicantWebHook(APIView):

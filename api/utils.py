@@ -1,4 +1,6 @@
 import datetime
+import hashlib
+import hmac
 import json
 
 import requests
@@ -76,3 +78,22 @@ def add_applicant_to_vacancy(applicant_data, vacancy_id):
             app_obj = create_or_update_applicant(app_data)
             vac_obj.applicants.add(app_obj)
             vac_obj.save()
+
+
+def get_hmac(secret_key, request_body):
+    """
+    Returns X-Huntflow-Signature
+    """
+    signature = hmac.new(
+        secret_key.encode("utf-8"), request_body, hashlib.sha256
+    ).hexdigest()
+    return signature
+
+
+def hmac_is_valid(secret_key, request_body, received_hmac):
+    """
+    Check the received X-Huntflow-Signature with the expected
+    Returns: bool
+    """
+    expected_hmac = get_hmac(secret_key, request_body)
+    return expected_hmac == received_hmac
