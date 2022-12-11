@@ -9,7 +9,7 @@ from api.webhooks import ApplicantWebHook, VacancyWebHook
 schema_view = get_schema_view(
     openapi.Info(
         title="Huntflow integration service",
-        default_version="v1",
+        default_version="v1.1.0",
         description="Test task from Huntflow",
         contact=openapi.Contact(email="koval6polina@gmail.com"),
     ),
