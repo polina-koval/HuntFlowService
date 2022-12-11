@@ -22,7 +22,6 @@ class ApplicantWebHook(APIView):
         body = request.body
         # ------------------
         request_hmac = request.headers.get("X-Huntflow-Signature")
-        print(settings.APPLICANT_WEBHOOK_SECRET)
         if request_hmac and hmac_is_valid(
             settings.APPLICANT_WEBHOOK_SECRET,
             request.body,
@@ -52,20 +51,32 @@ class VacancyWebHook(APIView):
 
     def post(self, request, *args, **kwargs):
         json_data = json.loads(request.body)
-        vac_log = json_data["event"]["vacancy_log"]
-        if vac_log["state"]:
-            position = json_data["event"]["vacancy"]["position"]
-            vac_hf_id = json_data["event"]["vacancy"]["id"]
-            if vac_log["state"] == "OPEN":
-                vacancy, _ = Vacancy.objects.get_or_create(
-                    hf_id=vac_hf_id,
-                    defaults={
-                        "position": position,
-                        "status": Vacancy.Statuses.OPEN,
-                    },
-                )
-                applicants = search_applicants(position=position)
-                add_applicant_to_vacancy(applicants, vac_hf_id)
-            if vac_log["state"] == "REMOVED":
-                Vacancy.objects.filter(position=position).delete()
+       # ------------------
+        request_hmac = request.headers.get("X-Huntflow-Signature")
+        if request_hmac and hmac_is_valid(
+                settings.VACANCY_WEBHOOK_SECRET,
+                request.body,
+                request_hmac,
+        ):
+            print("Yeeeep")
+        else:
+            print("NOOOOOO")
+        # ------------------
+        if json_data.get("event"):
+            vac_log = json_data["event"]["vacancy_log"]
+            if vac_log["state"]:
+                position = json_data["event"]["vacancy"]["position"]
+                vac_hf_id = json_data["event"]["vacancy"]["id"]
+                if vac_log["state"] == "OPEN":
+                    vacancy, _ = Vacancy.objects.get_or_create(
+                        hf_id=vac_hf_id,
+                        defaults={
+                            "position": position,
+                            "status": Vacancy.Statuses.OPEN,
+                        },
+                    )
+                    add_applicant_to_vacancy(position, vac_hf_id)
+                if vac_log["state"] == "REMOVED":
+                    Vacancy.objects.filter(position=position).delete()
+            return Response({}, status=status.HTTP_200_OK)
         return Response({}, status=status.HTTP_200_OK)

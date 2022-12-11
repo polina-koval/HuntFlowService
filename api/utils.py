@@ -53,7 +53,8 @@ def search_applicants(position):
     return data
 
 
-def add_applicant_to_vacancy(applicant_data, vacancy_id):
+def add_applicant_to_vacancy(position, vacancy_id):
+    applicant_data = search_applicants(position=position)
     if (
         applicant_data
         and applicant_data["items"]
