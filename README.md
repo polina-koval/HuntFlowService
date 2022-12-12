@@ -1,7 +1,18 @@
 # HuntFlow integration service (HIF)
 Back-end rest api and admin interface for HIF. It works with python 3.11.
+> The main tasks of the service:
+>* Storage of `Vacancies`, `Applicants` and applicant `Tags`(In this service, 
+entity fields are partially truncated (for example, an applicant doesn't have 
+a Skype field, a vacancy doesn't have a field - salary expectations, etc. 
+as in Huntflow) in order not to complicate the test task and the code base.);
+>* Partial synchronization of data with Huntflow (using webhooks):
+   >  * creation of a new `applicant`;
+   >  * updating the data of an existing `applicant`;
+   >  * add/remove applicants `tags`;
+   >  * opening and removal of `vacancies`;
+   >  * assignment of a suitable `applicant` when opening a `vacancy`;
+   >  * assignment the "hired" `tag` to the `applicant` when he moves to the "Offer accepted" stage.
 
-*(The text of the test task in the test_task.txt file.)*
 
 ## Getting Started
 The first thing to do is to clone the repository:  
@@ -44,7 +55,7 @@ Django:
 ```
 
 ## Main urls
-- http://127.0.0.1:8000/admin/ - Admin Area;
+- http://127.0.0.1:8000/admin/ - Admin Area (Convenient data management (viewing, editing, adding new objects);
 - http://127.0.0.1:8000/api/ - API (consist tags, applicants and vacancies endpoints);
 - http://127.0.0.1:8000/api/swagger/ - Swagger;
 - http://127.0.0.1:8000/api/redoc/ - API Documentation;
